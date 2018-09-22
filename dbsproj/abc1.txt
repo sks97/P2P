@@ -1,0 +1,85 @@
+user - myuser1
+password - mypassword
+
+
+create table login(user_id varchar(10), 
+		name varchar(10), 
+		type integer,
+		password varchar(20),
+		primary key (user_id));
+
+insert into login values ('a1', 'ADMIN', 1 , 'adminmain');
+insert into login values ('l1', 'LIB', 2, 'libmain');
+insert into login values ('l2', 'LIB', 2 , 'libmain');
+insert into login values ('l3', 'LIB', 2 , 'libmain');
+
+"insert into login values('" +u+ "','" +n+ "'," +t+ ",'" +p+"')"
+
+
+create table publisher (publisher_id int,
+			name varchar(10),
+			address varchar(20),
+			primary key(publisher_id));
+create table book (book_id int ,
+			title varchar(20),
+			availability int,
+			author varchar(20),
+			publisher_id int,
+			primary key(book_id),
+		foreign key (publisher_id) references publisher);
+
+create table member (member_id varchar(10),
+			name varchar(20),
+			address varchar(20),
+			fine_due int,
+			primary key (member_id));
+create table borrow(member_id varchar(10),
+			book_id int,
+			issue_date date,
+			validity int,
+			foreign key (member_id) references member,
+			foreign key (book_id) references book);
+
+insert into member values('1','arvind','Kolkata',0);
+ insert into member values('2','satyam','Kolkata',0);
+insert into member values('3','naman','delhi',0);
+
+insert into publisher values(1,'ABC','Manipal');
+insert into publisher values(2,'Penguin','Bangalore');
+
+insert into book values(221,'Hardy Boys',25,'Thomas Hardy',1);
+insert into book values(225,'Animal Farm',12,'George Orwell',1);
+insert into book values(212,'Ghostbusters',15,'Rajkumar Rao',2);
+
+insert into borrow values('2',221,to_date('11-12-1997','dd-mm-yyyy'),7);
+insert into borrow values('1',225,to_date('12-12-1997','dd-mm-yyyy'),7);
+
+  
+create or replace procedure data_update AS	
+y int;
+z varchar(10);
+begin
+	update borrow 
+	set validity=validity-1;
+
+	declare cursor x IS
+	select member_id,validity
+	from borrow;
+
+begin
+	open x;		
+	loop
+		fetch x into z,y;
+		if y<0 then
+			update member
+			set fine_due=(-1*y)
+			where member_id=z;
+		end if;
+		
+		exit when x%NOTFOUND;
+	end loop;
+	close x;
+end;				
+end;
+/
+
