@@ -1,0 +1,37 @@
+i - Switch to INSERT mode before current position
+I - Switch to INSERT mode at the beginning of the current line
+a - Switch to INSERT mode after current position
+A - Switch to INSERT mode at the end of the current line
+o - Switch to INSERT mode after opening a new line after the current line
+O - Switch to INSERT mode after opening a new line before the current line
+
+w - Skip to next word
+W - Skipe to next WORD (WORDs are only delineated by spaces)
+e - Move to end of word
+E - Move to end of WORD
+r - Replace a single character
+R - Replace all following characters
+c - Change (Delete and enter insert mode) whatever we specify
+C - Change until the end of a line
+
+x - Delete the character at the cursor's position
+X - Delete the character before the cursor (like backspace)
+d - Delete what we specify
+D - Delete to end of current line
+
+y - Yank what we specify
+Y - Yank the current line
+p - Paste after the cursor's position
+P - Paste before the cursor's position
+d - Delete what we specify (But also copy it - 'Cut')
+D - Delete to the end of current line (But also copy it - 'Cut')
+
+:set nu - Line Numbers
+:set rnu - Relative Line numbers
+
+/ - Search forward
+? - Search backward
+n - Advance to next search result
+N - Advance to previous search result
+:nohlsearch - Remove search highlights
+:beg,ends/query/replace/flags - Search and replace where % is the entire document and g is a flag indicating the replacing of all instances throughout the document.
