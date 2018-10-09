@@ -1,0 +1,148 @@
+user - myuser1
+password - mypassword
+
+
+create table login(user_id varchar(10),
+			member_id varchar(10), 
+		name varchar(10), 
+		type integer,
+		password varchar(20),
+		primary key (user_id));
+
+
+"insert into login values('" +u+ "','" +n+ "'," +t+ ",'" +p+"')"
+
+
+create table publisher (publisher_id int,
+			name varchar(30),
+			address varchar(20),
+			primary key(publisher_id));
+create table book (book_id int ,
+			title varchar(20),
+			availability int,
+			author varchar(20),
+			publisher_id int,
+			primary key(book_id),
+		foreign key (publisher_id) references publisher);
+
+create table member (member_id varchar(10),
+			name varchar(20),
+			address varchar(20),
+			fine_due int default 0,
+			primary key (member_id)
+			);
+create table borrow(member_id varchar(10),
+			book_id int,
+			issue_date date,
+			validity int,
+			foreign key (member_id) references member,
+			foreign key (book_id) references book);
+
+create or replace trigger trig
+after insert on borrow
+for each row
+begin
+update book
+set availability = availability -1
+where book.book_id = :new.book_id;
+end;
+/
+
+create or replace trigger trig2
+after delete on borrow
+for each row
+begin
+update book
+set availability = availability +1
+where book.book_id = :old.book_id;
+update member
+set fine_due = 0
+where member.member_id = :old.member_id;
+end;
+/
+
+insert into publisher values(1,'Penguin','london');
+insert into publisher values(2,'hachette','bath');
+insert into publisher values(3,'harperCollins','manchester');
+insert into publisher values(4,'ncert','delhi');
+insert into publisher values(5,'rupa','delhi');
+insert into publisher values(6,'oxford','london');
+insert into publisher values(7,'roli','mumbai');
+insert into publisher values(8,'aleph','london');
+insert into publisher values(9,'westland','delhi');
+insert into publisher values(10,'jaico','delhi');
+
+
+
+insert into book values(1,'lincoln',3,'george',1);
+insert into book values(2,'9-11',5,'steve',2);
+insert into book values(3,'obama',2,'alex',3);
+insert into book values(4,'science',3,'sharma',4);
+insert into book values(5,'meena',2,'das',5);
+insert into book values(6,'LL',8,'manan',6);
+insert into book values(7,'gigi',4,'hadid',7);
+insert into book values(8,'times square',6,'pandy',8);
+insert into book values(9,'shayk',8,'irina',9);
+insert into book values(10,'august',1,'sunderland',10);
+insert into book values(11,'maths',3,'verma',4);
+insert into book values(12,'dbs',3,'RA',1);
+insert into book values(13,'SE',4,'AKC',4);
+
+
+
+insert into member values('m1','naman','delhi',0);
+insert into member values('m2','arvind','delhi',0);
+insert into member values('m3','satyam','kolkata',0);
+insert into member values('m4','diwan','delhi',0);
+insert into member values('m5','rmcf','delhi',0);
+
+create table supplier(supplier_id varchar(20),
+			name varchar(20),
+			address varchar(20),
+			primary key (supplier_id));
+
+insert into supplier values ('s1' , 'aditya' , 'delhi');
+insert into supplier values ('s2' , 'ram' , 'gorakhpur');
+insert into supplier values ('s3' , 'shyaam' , 'bhopal');
+insert into supplier values ('s4' , 'brajesh' , 'indore');
+insert into supplier values ('s5' , 'vaibhav' , 'patna');
+
+
+insert into login values('m1','m1','naman',3,'naman');
+insert into login values('m2','m2','arvind',3,'arvind');
+insert into login values('m3','m3','satyam',3,'satyam');
+insert into login values('m4','m4','diwan',3,'diwan');
+insert into login values('m5','m5','rmcf',3,'rmcf');
+insert into login values('l1','0','lib1',2,'lib1');
+insert into login values('l2','0','lib2',2,'lib2');
+insert into login values('l3','0','lib3',2,'lib3');
+insert into login values('a1','0','admin1',1,'admin1');
+insert into login values('a2','0','admin2',1,'admin2');
+
+create or replace procedure data_update AS	
+y int;
+z varchar(10);
+ cursor x IS
+	select sum(validity),member_id
+	from borrow
+	where validity<0
+	group by member_id;
+
+begin
+	update borrow 
+	set validity=validity-1;
+
+	open x;		
+	loop
+	exit when x%NOTFOUND;
+		fetch x into y,z;
+		update member
+		set fine_due=(-1*y)
+		where member_id=z;
+		
+	end loop;
+	close x;
+				
+end;
+/
+
